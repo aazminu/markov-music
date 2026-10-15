@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "markov-music"
+version = "0.2.0"
+description = "Variable-order Markov chain and harmonic-constraint musical sequence generator with Kneser-Ney/Katz backoff smoothing and information-theoretic evaluation"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "Abdullah Azmi", email = "greatnessings@gmail.com" }
+]
+dependencies = [
+  "numpy>=1.24.0"
+]
+
+[project.scripts]
+markov-music = "src.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "src"]
