@@ -329,8 +329,17 @@ class MarkovChain:
                     "smoothing_alpha": self.smoothing_alpha,
                     "enable_backoff": self.enable_backoff,
                     "harmony_weight": self.harmony_weight,
-                    "transition_matrix": dict(self.transition_matrix),
+                    "transition_matrix": {
+                        ctx: dict(counts) for ctx, counts in self.transition_matrix.items()
+                    },
                     "state_counts": dict(self.state_counts),
+                    "backoff_matrices": {
+                        k: {ctx: dict(counts) for ctx, counts in mat.items()}
+                        for k, mat in self.backoff_matrices.items()
+                    },
+                    "backoff_counts": {
+                        k: dict(cnts) for k, cnts in self.backoff_counts.items()
+                    },
                     "unigram_counts": dict(self.unigram_counts),
                     "total_unigrams": self.total_unigrams,
                     "all_states": list(self.all_states),
@@ -341,17 +350,30 @@ class MarkovChain:
     def load(self, filepath: str):
         with open(filepath, "rb") as f:
             data = pickle.load(f)
-            self.order = data["order"]
-            self.smoothing_alpha = data.get("smoothing_alpha", 0.0)
-            self.enable_backoff = data.get("enable_backoff", True)
-            self.harmony_weight = data.get("harmony_weight", 0.0)
+            self.order = int(data["order"])
+            self.smoothing_alpha = float(data.get("smoothing_alpha", 0.0))
+            self.enable_backoff = bool(data.get("enable_backoff", True))
+            self.harmony_weight = float(data.get("harmony_weight", 0.0))
             self.transition_matrix = defaultdict(
                 lambda: defaultdict(int),
                 {k: defaultdict(int, v) for k, v in data["transition_matrix"].items()},
             )
             self.state_counts = defaultdict(int, data["state_counts"])
+            raw_backoff_mats = data.get("backoff_matrices", {})
+            raw_backoff_cnts = data.get("backoff_counts", {})
+            self.backoff_matrices = {
+                k: defaultdict(
+                    lambda: defaultdict(int),
+                    {ctx: defaultdict(int, cnts) for ctx, cnts in raw_backoff_mats.get(k, {}).items()},
+                )
+                for k in range(1, self.order)
+            }
+            self.backoff_counts = {
+                k: defaultdict(int, raw_backoff_cnts.get(k, {}))
+                for k in range(1, self.order)
+            }
             self.unigram_counts = defaultdict(int, data.get("unigram_counts", {}))
-            self.total_unigrams = data.get("total_unigrams", 0)
+            self.total_unigrams = int(data.get("total_unigrams", 0))
             self.all_states = set(data["all_states"])
 
 
