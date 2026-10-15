@@ -1,0 +1,45 @@
+LATEX TABLE:
+============================================================
+\begin{table}[h]
+\centering
+\caption{Model Performance Metrics}
+\label{tab:model_performance}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Configuration} & \textbf{NLL} & \textbf{Avg Log-Likelihood} & \textbf{Coverage} & \textbf{Unique States} \\
+\midrule
+Nottingham, Order 1, Pitch Only & XXX.XX & -XXX.XX & XX.XX\% & XXXX \\
+Nottingham, Order 1, With Rhythm & XXX.XX & -XXX.XX & XX.XX\% & XXXX \\
+Nottingham, Order 3, Pitch Only & XXX.XX & -XXX.XX & XX.XX\% & XXXX \\
+Nottingham, Order 3, With Rhythm & XXX.XX & -XXX.XX & XX.XX\% & XXXX \\
+Nottingham, Order 5, Pitch Only & XXX.XX & -XXX.XX & XX.XX\% & XXXX \\
+Nottingham, Order 5, With Rhythm & XXX.XX & -XXX.XX & XX.XX\% & XXXX \\
+Pop909, Order 1, Pitch Only & XXX.XX & -XXX.XX & XX.XX\% & XXXX \\
+Pop909, Order 1, With Rhythm & XXX.XX & -XXX.XX & XX.XX\% & XXXX \\
+Pop909, Order 3, Pitch Only & XXX.XX & -XXX.XX & XX.XX\% & XXXX \\
+Pop909, Order 3, With Rhythm & XXX.XX & -XXX.XX & XX.XX\% & XXXX \\
+Pop909, Order 5, Pitch Only & XXX.XX & -XXX.XX & XX.XX\% & XXXX \\
+Pop909, Order 5, With Rhythm & XXX.XX & -XXX.XX & XX.XX\% & XXXX \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+MARKDOWN TABLE:
+============================================================
+## Model Performance Metrics
+
+| Configuration | NLL | Avg Log-Likelihood | Coverage | Unique States |
+|---------------|-----|---------------------|----------|---------------|
+| Nottingham, Order 1, Pitch Only | XXX.XX | -XXX.XX | XX.XX% | XXXX |
+| Nottingham, Order 1, With Rhythm | XXX.XX | -XXX.XX | XX.XX% | XXXX |
+| Nottingham, Order 3, Pitch Only | XXX.XX | -XXX.XX | XX.XX% | XXXX |
+| Nottingham, Order 3, With Rhythm | XXX.XX | -XXX.XX | XX.XX% | XXXX |
+| Nottingham, Order 5, Pitch Only | XXX.XX | -XXX.XX | XX.XX% | XXXX |
+| Nottingham, Order 5, With Rhythm | XXX.XX | -XXX.XX | XX.XX% | XXXX |
+| Pop909, Order 1, Pitch Only | XXX.XX | -XXX.XX | XX.XX% | XXXX |
+| Pop909, Order 1, With Rhythm | XXX.XX | -XXX.XX | XX.XX% | XXXX |
+| Pop909, Order 3, Pitch Only | XXX.XX | -XXX.XX | XX.XX% | XXXX |
+| Pop909, Order 3, With Rhythm | XXX.XX | -XXX.XX | XX.XX% | XXXX |
+| Pop909, Order 5, Pitch Only | XXX.XX | -XXX.XX | XX.XX% | XXXX |
+| Pop909, Order 5, With Rhythm | XXX.XX | -XXX.XX | XX.XX% | XXXX |

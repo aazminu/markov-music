@@ -1,0 +1,9 @@
+# Ignore local datasets fetched outside of git submodules.
+data/bach_chorales/
+
+# OS cruft
+.DS_Store
+
+
+# Snyk Security Extension - AI Rules (auto-generated)
+.github/instructions/snyk_rules.instructions.md

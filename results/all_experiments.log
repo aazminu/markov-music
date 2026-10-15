@@ -1,0 +1,886 @@
+==========================================
+Running All Experiments for Results Section
+==========================================
+
+==========================================
+PART 1: Nottingham Dataset Experiments
+==========================================
+Nottingham - Order 1, Pitch Only...
+/Users/nehirozden/anaconda3/lib/python3.11/site-packages/music21/stream/base.py:3675: Music21DeprecationWarning: .flat is deprecated.  Call .flatten() instead
+  return self.iter().getElementsByClass(classFilterList)
+============================================================
+Markov Chain Music Generation - Training Pipeline
+============================================================
+Dataset: nottingham
+Order: 1
+Include Rhythm: False
+Max Files: 200
+============================================================
+
+[Step 1] Loading dataset...
+Loading MIDI files from data/nottingham_github/MIDI...
+Found 200 MIDI files
+Processed 100/200 files...
+Processed 200/200 files...
+Successfully loaded 200 sequences
+Loaded 200 sequences
+Average sequence length: 171.3 states
+
+[Step 2] Splitting into train/validation sets...
+Training sequences: 160
+Validation sequences: 40
+
+[Step 3] Training 1-order Markov chain...
+Training 1-order Markov chain on 160 sequences...
+Learned 30 unique contexts
+Total transitions: 27423
+Unique states: 30
+
+[Step 4] Evaluating model...
+
+Evaluating model on validation set...
+
+==================================================
+1-order Markov Chain Evaluation Metrics
+==================================================
+Negative Log-Likelihood (NLL): 353.5424
+Average Log-Likelihood: -353.5424
+State Coverage: 100.00%
+Validation Sequences: 40
+Valid Sequences (for evaluation): 40
+==================================================
+
+
+[Step 5] Generating 5 sample pieces...
+Generated MIDI saved to results/nottingham/order1_pitch_only/nottingham_order1_sample1.mid
+  Generated sample 1: 172 states -> results/nottingham/order1_pitch_only/nottingham_order1_sample1.mid
+Generated MIDI saved to results/nottingham/order1_pitch_only/nottingham_order1_sample2.mid
+  Generated sample 2: 172 states -> results/nottingham/order1_pitch_only/nottingham_order1_sample2.mid
+Generated MIDI saved to results/nottingham/order1_pitch_only/nottingham_order1_sample3.mid
+  Generated sample 3: 172 states -> results/nottingham/order1_pitch_only/nottingham_order1_sample3.mid
+Generated MIDI saved to results/nottingham/order1_pitch_only/nottingham_order1_sample4.mid
+  Generated sample 4: 172 states -> results/nottingham/order1_pitch_only/nottingham_order1_sample4.mid
+Generated MIDI saved to results/nottingham/order1_pitch_only/nottingham_order1_sample5.mid
+  Generated sample 5: 172 states -> results/nottingham/order1_pitch_only/nottingham_order1_sample5.mid
+Model saved to results/nottingham/order1_pitch_only/model_order1.pkl
+
+Model saved to results/nottingham/order1_pitch_only/model_order1.pkl
+
+============================================================
+Training and generation complete!
+============================================================
+
+Generated files are in: results/nottingham/order1_pitch_only
+Model file: results/nottingham/order1_pitch_only/model_order1.pkl
+
+You can now:
+  1. Listen to the generated MIDI files
+  2. Compare different orders (run with --order 1, 2, 3)
+  3. Compare with/without rhythm (--include_rhythm flag)
+  4. Use the saved model to generate more music later
+Nottingham - Order 1, With Rhythm...
+/Users/nehirozden/anaconda3/lib/python3.11/site-packages/music21/stream/base.py:3675: Music21DeprecationWarning: .flat is deprecated.  Call .flatten() instead
+  return self.iter().getElementsByClass(classFilterList)
+============================================================
+Markov Chain Music Generation - Training Pipeline
+============================================================
+Dataset: nottingham
+Order: 1
+Include Rhythm: True
+Max Files: 200
+============================================================
+
+[Step 1] Loading dataset...
+Loading MIDI files from data/nottingham_github/MIDI...
+Found 200 MIDI files
+Processed 100/200 files...
+Processed 200/200 files...
+Successfully loaded 200 sequences
+Loaded 200 sequences
+Average sequence length: 171.3 states
+
+[Step 2] Splitting into train/validation sets...
+Training sequences: 160
+Validation sequences: 40
+
+[Step 3] Training 1-order Markov chain...
+Training 1-order Markov chain on 160 sequences...
+Learned 181 unique contexts
+Total transitions: 27423
+Unique states: 182
+
+[Step 4] Evaluating model...
+
+Evaluating model on validation set...
+
+==================================================
+1-order Markov Chain Evaluation Metrics
+==================================================
+Negative Log-Likelihood (NLL): 715.2903
+Average Log-Likelihood: -715.2903
+State Coverage: 97.66%
+Validation Sequences: 40
+Valid Sequences (for evaluation): 40
+==================================================
+
+
+[Step 5] Generating 5 sample pieces...
+Generated MIDI saved to results/nottingham/order1_with_rhythm/nottingham_order1_sample1.mid
+  Generated sample 1: 172 states -> results/nottingham/order1_with_rhythm/nottingham_order1_sample1.mid
+Generated MIDI saved to results/nottingham/order1_with_rhythm/nottingham_order1_sample2.mid
+  Generated sample 2: 172 states -> results/nottingham/order1_with_rhythm/nottingham_order1_sample2.mid
+Generated MIDI saved to results/nottingham/order1_with_rhythm/nottingham_order1_sample3.mid
+  Generated sample 3: 172 states -> results/nottingham/order1_with_rhythm/nottingham_order1_sample3.mid
+Generated MIDI saved to results/nottingham/order1_with_rhythm/nottingham_order1_sample4.mid
+  Generated sample 4: 172 states -> results/nottingham/order1_with_rhythm/nottingham_order1_sample4.mid
+Generated MIDI saved to results/nottingham/order1_with_rhythm/nottingham_order1_sample5.mid
+  Generated sample 5: 172 states -> results/nottingham/order1_with_rhythm/nottingham_order1_sample5.mid
+Model saved to results/nottingham/order1_with_rhythm/model_order1.pkl
+
+Model saved to results/nottingham/order1_with_rhythm/model_order1.pkl
+
+============================================================
+Training and generation complete!
+============================================================
+
+Generated files are in: results/nottingham/order1_with_rhythm
+Model file: results/nottingham/order1_with_rhythm/model_order1.pkl
+
+You can now:
+  1. Listen to the generated MIDI files
+  2. Compare different orders (run with --order 1, 2, 3)
+  3. Compare with/without rhythm (--include_rhythm flag)
+  4. Use the saved model to generate more music later
+Nottingham - Order 3, Pitch Only...
+/Users/nehirozden/anaconda3/lib/python3.11/site-packages/music21/stream/base.py:3675: Music21DeprecationWarning: .flat is deprecated.  Call .flatten() instead
+  return self.iter().getElementsByClass(classFilterList)
+============================================================
+Markov Chain Music Generation - Training Pipeline
+============================================================
+Dataset: nottingham
+Order: 3
+Include Rhythm: False
+Max Files: 200
+============================================================
+
+[Step 1] Loading dataset...
+Loading MIDI files from data/nottingham_github/MIDI...
+Found 200 MIDI files
+Processed 100/200 files...
+Processed 200/200 files...
+Successfully loaded 200 sequences
+Loaded 200 sequences
+Average sequence length: 171.3 states
+
+[Step 2] Splitting into train/validation sets...
+Training sequences: 160
+Validation sequences: 40
+
+[Step 3] Training 3-order Markov chain...
+Training 3-order Markov chain on 160 sequences...
+Learned 1703 unique contexts
+Total transitions: 27103
+Unique states: 30
+
+[Step 4] Evaluating model...
+
+Evaluating model on validation set...
+
+==================================================
+3-order Markov Chain Evaluation Metrics
+==================================================
+Negative Log-Likelihood (NLL): 833.6699
+Average Log-Likelihood: -833.6699
+State Coverage: 100.00%
+Validation Sequences: 40
+Valid Sequences (for evaluation): 40
+==================================================
+
+
+[Step 5] Generating 5 sample pieces...
+Generated MIDI saved to results/nottingham/order3_pitch_only/nottingham_order3_sample1.mid
+  Generated sample 1: 172 states -> results/nottingham/order3_pitch_only/nottingham_order3_sample1.mid
+Generated MIDI saved to results/nottingham/order3_pitch_only/nottingham_order3_sample2.mid
+  Generated sample 2: 172 states -> results/nottingham/order3_pitch_only/nottingham_order3_sample2.mid
+Generated MIDI saved to results/nottingham/order3_pitch_only/nottingham_order3_sample3.mid
+  Generated sample 3: 172 states -> results/nottingham/order3_pitch_only/nottingham_order3_sample3.mid
+Generated MIDI saved to results/nottingham/order3_pitch_only/nottingham_order3_sample4.mid
+  Generated sample 4: 172 states -> results/nottingham/order3_pitch_only/nottingham_order3_sample4.mid
+Generated MIDI saved to results/nottingham/order3_pitch_only/nottingham_order3_sample5.mid
+  Generated sample 5: 172 states -> results/nottingham/order3_pitch_only/nottingham_order3_sample5.mid
+Model saved to results/nottingham/order3_pitch_only/model_order3.pkl
+
+Model saved to results/nottingham/order3_pitch_only/model_order3.pkl
+
+============================================================
+Training and generation complete!
+============================================================
+
+Generated files are in: results/nottingham/order3_pitch_only
+Model file: results/nottingham/order3_pitch_only/model_order3.pkl
+
+You can now:
+  1. Listen to the generated MIDI files
+  2. Compare different orders (run with --order 1, 2, 3)
+  3. Compare with/without rhythm (--include_rhythm flag)
+  4. Use the saved model to generate more music later
+Nottingham - Order 3, With Rhythm...
+/Users/nehirozden/anaconda3/lib/python3.11/site-packages/music21/stream/base.py:3675: Music21DeprecationWarning: .flat is deprecated.  Call .flatten() instead
+  return self.iter().getElementsByClass(classFilterList)
+============================================================
+Markov Chain Music Generation - Training Pipeline
+============================================================
+Dataset: nottingham
+Order: 3
+Include Rhythm: True
+Max Files: 200
+============================================================
+
+[Step 1] Loading dataset...
+Loading MIDI files from data/nottingham_github/MIDI...
+Found 200 MIDI files
+Processed 100/200 files...
+Processed 200/200 files...
+Successfully loaded 200 sequences
+Loaded 200 sequences
+Average sequence length: 171.3 states
+
+[Step 2] Splitting into train/validation sets...
+Training sequences: 160
+Validation sequences: 40
+
+[Step 3] Training 3-order Markov chain...
+Training 3-order Markov chain on 160 sequences...
+Learned 5850 unique contexts
+Total transitions: 27103
+Unique states: 182
+
+[Step 4] Evaluating model...
+
+Evaluating model on validation set...
+
+==================================================
+3-order Markov Chain Evaluation Metrics
+==================================================
+Negative Log-Likelihood (NLL): 1548.1802
+Average Log-Likelihood: -1548.1802
+State Coverage: 97.66%
+Validation Sequences: 40
+Valid Sequences (for evaluation): 40
+==================================================
+
+
+[Step 5] Generating 5 sample pieces...
+Generated MIDI saved to results/nottingham/order3_with_rhythm/nottingham_order3_sample1.mid
+  Generated sample 1: 172 states -> results/nottingham/order3_with_rhythm/nottingham_order3_sample1.mid
+Generated MIDI saved to results/nottingham/order3_with_rhythm/nottingham_order3_sample2.mid
+  Generated sample 2: 172 states -> results/nottingham/order3_with_rhythm/nottingham_order3_sample2.mid
+Generated MIDI saved to results/nottingham/order3_with_rhythm/nottingham_order3_sample3.mid
+  Generated sample 3: 172 states -> results/nottingham/order3_with_rhythm/nottingham_order3_sample3.mid
+Generated MIDI saved to results/nottingham/order3_with_rhythm/nottingham_order3_sample4.mid
+  Generated sample 4: 172 states -> results/nottingham/order3_with_rhythm/nottingham_order3_sample4.mid
+Generated MIDI saved to results/nottingham/order3_with_rhythm/nottingham_order3_sample5.mid
+  Generated sample 5: 172 states -> results/nottingham/order3_with_rhythm/nottingham_order3_sample5.mid
+Model saved to results/nottingham/order3_with_rhythm/model_order3.pkl
+
+Model saved to results/nottingham/order3_with_rhythm/model_order3.pkl
+
+============================================================
+Training and generation complete!
+============================================================
+
+Generated files are in: results/nottingham/order3_with_rhythm
+Model file: results/nottingham/order3_with_rhythm/model_order3.pkl
+
+You can now:
+  1. Listen to the generated MIDI files
+  2. Compare different orders (run with --order 1, 2, 3)
+  3. Compare with/without rhythm (--include_rhythm flag)
+  4. Use the saved model to generate more music later
+Nottingham - Order 5, Pitch Only...
+/Users/nehirozden/anaconda3/lib/python3.11/site-packages/music21/stream/base.py:3675: Music21DeprecationWarning: .flat is deprecated.  Call .flatten() instead
+  return self.iter().getElementsByClass(classFilterList)
+============================================================
+Markov Chain Music Generation - Training Pipeline
+============================================================
+Dataset: nottingham
+Order: 5
+Include Rhythm: False
+Max Files: 200
+============================================================
+
+[Step 1] Loading dataset...
+Loading MIDI files from data/nottingham_github/MIDI...
+Found 200 MIDI files
+Processed 100/200 files...
+Processed 200/200 files...
+Successfully loaded 200 sequences
+Loaded 200 sequences
+Average sequence length: 171.3 states
+
+[Step 2] Splitting into train/validation sets...
+Training sequences: 160
+Validation sequences: 40
+
+[Step 3] Training 5-order Markov chain...
+Training 5-order Markov chain on 160 sequences...
+Learned 7575 unique contexts
+Total transitions: 26783
+Unique states: 30
+
+[Step 4] Evaluating model...
+
+Evaluating model on validation set...
+
+==================================================
+5-order Markov Chain Evaluation Metrics
+==================================================
+Negative Log-Likelihood (NLL): 1158.1096
+Average Log-Likelihood: -1158.1096
+State Coverage: 100.00%
+Validation Sequences: 40
+Valid Sequences (for evaluation): 40
+==================================================
+
+
+[Step 5] Generating 5 sample pieces...
+Generated MIDI saved to results/nottingham/order5_pitch_only/nottingham_order5_sample1.mid
+  Generated sample 1: 172 states -> results/nottingham/order5_pitch_only/nottingham_order5_sample1.mid
+Generated MIDI saved to results/nottingham/order5_pitch_only/nottingham_order5_sample2.mid
+  Generated sample 2: 172 states -> results/nottingham/order5_pitch_only/nottingham_order5_sample2.mid
+Generated MIDI saved to results/nottingham/order5_pitch_only/nottingham_order5_sample3.mid
+  Generated sample 3: 172 states -> results/nottingham/order5_pitch_only/nottingham_order5_sample3.mid
+Generated MIDI saved to results/nottingham/order5_pitch_only/nottingham_order5_sample4.mid
+  Generated sample 4: 172 states -> results/nottingham/order5_pitch_only/nottingham_order5_sample4.mid
+Generated MIDI saved to results/nottingham/order5_pitch_only/nottingham_order5_sample5.mid
+  Generated sample 5: 172 states -> results/nottingham/order5_pitch_only/nottingham_order5_sample5.mid
+Model saved to results/nottingham/order5_pitch_only/model_order5.pkl
+
+Model saved to results/nottingham/order5_pitch_only/model_order5.pkl
+
+============================================================
+Training and generation complete!
+============================================================
+
+Generated files are in: results/nottingham/order5_pitch_only
+Model file: results/nottingham/order5_pitch_only/model_order5.pkl
+
+You can now:
+  1. Listen to the generated MIDI files
+  2. Compare different orders (run with --order 1, 2, 3)
+  3. Compare with/without rhythm (--include_rhythm flag)
+  4. Use the saved model to generate more music later
+Nottingham - Order 5, With Rhythm...
+/Users/nehirozden/anaconda3/lib/python3.11/site-packages/music21/stream/base.py:3675: Music21DeprecationWarning: .flat is deprecated.  Call .flatten() instead
+  return self.iter().getElementsByClass(classFilterList)
+============================================================
+Markov Chain Music Generation - Training Pipeline
+============================================================
+Dataset: nottingham
+Order: 5
+Include Rhythm: True
+Max Files: 200
+============================================================
+
+[Step 1] Loading dataset...
+Loading MIDI files from data/nottingham_github/MIDI...
+Found 200 MIDI files
+Processed 100/200 files...
+Processed 200/200 files...
+Successfully loaded 200 sequences
+Loaded 200 sequences
+Average sequence length: 171.3 states
+
+[Step 2] Splitting into train/validation sets...
+Training sequences: 160
+Validation sequences: 40
+
+[Step 3] Training 5-order Markov chain...
+Training 5-order Markov chain on 160 sequences...
+Learned 10751 unique contexts
+Total transitions: 26783
+Unique states: 182
+
+[Step 4] Evaluating model...
+
+Evaluating model on validation set...
+
+==================================================
+5-order Markov Chain Evaluation Metrics
+==================================================
+Negative Log-Likelihood (NLL): 1011.0187
+Average Log-Likelihood: -1011.0187
+State Coverage: 97.66%
+Validation Sequences: 40
+Valid Sequences (for evaluation): 40
+==================================================
+
+
+[Step 5] Generating 5 sample pieces...
+Generated MIDI saved to results/nottingham/order5_with_rhythm/nottingham_order5_sample1.mid
+  Generated sample 1: 172 states -> results/nottingham/order5_with_rhythm/nottingham_order5_sample1.mid
+Generated MIDI saved to results/nottingham/order5_with_rhythm/nottingham_order5_sample2.mid
+  Generated sample 2: 172 states -> results/nottingham/order5_with_rhythm/nottingham_order5_sample2.mid
+Generated MIDI saved to results/nottingham/order5_with_rhythm/nottingham_order5_sample3.mid
+  Generated sample 3: 172 states -> results/nottingham/order5_with_rhythm/nottingham_order5_sample3.mid
+Generated MIDI saved to results/nottingham/order5_with_rhythm/nottingham_order5_sample4.mid
+  Generated sample 4: 172 states -> results/nottingham/order5_with_rhythm/nottingham_order5_sample4.mid
+Generated MIDI saved to results/nottingham/order5_with_rhythm/nottingham_order5_sample5.mid
+  Generated sample 5: 172 states -> results/nottingham/order5_with_rhythm/nottingham_order5_sample5.mid
+Model saved to results/nottingham/order5_with_rhythm/model_order5.pkl
+
+Model saved to results/nottingham/order5_with_rhythm/model_order5.pkl
+
+============================================================
+Training and generation complete!
+============================================================
+
+Generated files are in: results/nottingham/order5_with_rhythm
+Model file: results/nottingham/order5_with_rhythm/model_order5.pkl
+
+You can now:
+  1. Listen to the generated MIDI files
+  2. Compare different orders (run with --order 1, 2, 3)
+  3. Compare with/without rhythm (--include_rhythm flag)
+  4. Use the saved model to generate more music later
+
+==========================================
+PART 2: POP909 Dataset Experiments
+==========================================
+POP909 - Order 1, Pitch Only...
+/Users/nehirozden/anaconda3/lib/python3.11/site-packages/music21/stream/base.py:3675: Music21DeprecationWarning: .flat is deprecated.  Call .flatten() instead
+  return self.iter().getElementsByClass(classFilterList)
+============================================================
+Markov Chain Music Generation - Training Pipeline
+============================================================
+Dataset: pop909
+Order: 1
+Include Rhythm: False
+Max Files: 100
+============================================================
+
+[Step 1] Loading dataset...
+Loading MIDI files from data/pop909/POP909...
+Found 100 MIDI files
+Processed 100/100 files...
+Successfully loaded 100 sequences
+Loaded 100 sequences
+Average sequence length: 403.9 states
+
+[Step 2] Splitting into train/validation sets...
+Training sequences: 80
+Validation sequences: 20
+
+[Step 3] Training 1-order Markov chain...
+Training 1-order Markov chain on 80 sequences...
+Learned 37 unique contexts
+Total transitions: 31968
+Unique states: 37
+
+[Step 4] Evaluating model...
+
+Evaluating model on validation set...
+
+==================================================
+1-order Markov Chain Evaluation Metrics
+==================================================
+Negative Log-Likelihood (NLL): 840.9933
+Average Log-Likelihood: -840.9933
+State Coverage: 100.00%
+Validation Sequences: 20
+Valid Sequences (for evaluation): 20
+==================================================
+
+
+[Step 5] Generating 5 sample pieces...
+Generated MIDI saved to results/pop909/order1_pitch_only/pop909_order1_sample1.mid
+  Generated sample 1: 400 states -> results/pop909/order1_pitch_only/pop909_order1_sample1.mid
+Generated MIDI saved to results/pop909/order1_pitch_only/pop909_order1_sample2.mid
+  Generated sample 2: 400 states -> results/pop909/order1_pitch_only/pop909_order1_sample2.mid
+Generated MIDI saved to results/pop909/order1_pitch_only/pop909_order1_sample3.mid
+  Generated sample 3: 400 states -> results/pop909/order1_pitch_only/pop909_order1_sample3.mid
+Generated MIDI saved to results/pop909/order1_pitch_only/pop909_order1_sample4.mid
+  Generated sample 4: 400 states -> results/pop909/order1_pitch_only/pop909_order1_sample4.mid
+Generated MIDI saved to results/pop909/order1_pitch_only/pop909_order1_sample5.mid
+  Generated sample 5: 400 states -> results/pop909/order1_pitch_only/pop909_order1_sample5.mid
+Model saved to results/pop909/order1_pitch_only/model_order1.pkl
+
+Model saved to results/pop909/order1_pitch_only/model_order1.pkl
+
+============================================================
+Training and generation complete!
+============================================================
+
+Generated files are in: results/pop909/order1_pitch_only
+Model file: results/pop909/order1_pitch_only/model_order1.pkl
+
+You can now:
+  1. Listen to the generated MIDI files
+  2. Compare different orders (run with --order 1, 2, 3)
+  3. Compare with/without rhythm (--include_rhythm flag)
+  4. Use the saved model to generate more music later
+POP909 - Order 1, With Rhythm...
+/Users/nehirozden/anaconda3/lib/python3.11/site-packages/music21/stream/base.py:3675: Music21DeprecationWarning: .flat is deprecated.  Call .flatten() instead
+  return self.iter().getElementsByClass(classFilterList)
+============================================================
+Markov Chain Music Generation - Training Pipeline
+============================================================
+Dataset: pop909
+Order: 1
+Include Rhythm: True
+Max Files: 100
+============================================================
+
+[Step 1] Loading dataset...
+Loading MIDI files from data/pop909/POP909...
+Found 100 MIDI files
+Processed 100/100 files...
+Successfully loaded 100 sequences
+Loaded 100 sequences
+Average sequence length: 403.9 states
+
+[Step 2] Splitting into train/validation sets...
+Training sequences: 80
+Validation sequences: 20
+
+[Step 3] Training 1-order Markov chain...
+Training 1-order Markov chain on 80 sequences...
+Learned 166 unique contexts
+Total transitions: 31968
+Unique states: 168
+
+[Step 4] Evaluating model...
+
+Evaluating model on validation set...
+
+==================================================
+1-order Markov Chain Evaluation Metrics
+==================================================
+Negative Log-Likelihood (NLL): 1258.2903
+Average Log-Likelihood: -1258.2903
+State Coverage: 100.00%
+Validation Sequences: 20
+Valid Sequences (for evaluation): 20
+==================================================
+
+
+[Step 5] Generating 5 sample pieces...
+Generated MIDI saved to results/pop909/order1_with_rhythm/pop909_order1_sample1.mid
+  Generated sample 1: 400 states -> results/pop909/order1_with_rhythm/pop909_order1_sample1.mid
+Generated MIDI saved to results/pop909/order1_with_rhythm/pop909_order1_sample2.mid
+  Generated sample 2: 400 states -> results/pop909/order1_with_rhythm/pop909_order1_sample2.mid
+Generated MIDI saved to results/pop909/order1_with_rhythm/pop909_order1_sample3.mid
+  Generated sample 3: 400 states -> results/pop909/order1_with_rhythm/pop909_order1_sample3.mid
+Generated MIDI saved to results/pop909/order1_with_rhythm/pop909_order1_sample4.mid
+  Generated sample 4: 400 states -> results/pop909/order1_with_rhythm/pop909_order1_sample4.mid
+Generated MIDI saved to results/pop909/order1_with_rhythm/pop909_order1_sample5.mid
+  Generated sample 5: 400 states -> results/pop909/order1_with_rhythm/pop909_order1_sample5.mid
+Model saved to results/pop909/order1_with_rhythm/model_order1.pkl
+
+Model saved to results/pop909/order1_with_rhythm/model_order1.pkl
+
+============================================================
+Training and generation complete!
+============================================================
+
+Generated files are in: results/pop909/order1_with_rhythm
+Model file: results/pop909/order1_with_rhythm/model_order1.pkl
+
+You can now:
+  1. Listen to the generated MIDI files
+  2. Compare different orders (run with --order 1, 2, 3)
+  3. Compare with/without rhythm (--include_rhythm flag)
+  4. Use the saved model to generate more music later
+POP909 - Order 3, Pitch Only...
+/Users/nehirozden/anaconda3/lib/python3.11/site-packages/music21/stream/base.py:3675: Music21DeprecationWarning: .flat is deprecated.  Call .flatten() instead
+  return self.iter().getElementsByClass(classFilterList)
+============================================================
+Markov Chain Music Generation - Training Pipeline
+============================================================
+Dataset: pop909
+Order: 3
+Include Rhythm: False
+Max Files: 100
+============================================================
+
+[Step 1] Loading dataset...
+Loading MIDI files from data/pop909/POP909...
+Found 100 MIDI files
+Processed 100/100 files...
+Successfully loaded 100 sequences
+Loaded 100 sequences
+Average sequence length: 403.9 states
+
+[Step 2] Splitting into train/validation sets...
+Training sequences: 80
+Validation sequences: 20
+
+[Step 3] Training 3-order Markov chain...
+Training 3-order Markov chain on 80 sequences...
+Learned 1471 unique contexts
+Total transitions: 31808
+Unique states: 37
+
+[Step 4] Evaluating model...
+
+Evaluating model on validation set...
+
+==================================================
+3-order Markov Chain Evaluation Metrics
+==================================================
+Negative Log-Likelihood (NLL): 629.2926
+Average Log-Likelihood: -629.2926
+State Coverage: 100.00%
+Validation Sequences: 20
+Valid Sequences (for evaluation): 20
+==================================================
+
+
+[Step 5] Generating 5 sample pieces...
+Generated MIDI saved to results/pop909/order3_pitch_only/pop909_order3_sample1.mid
+  Generated sample 1: 400 states -> results/pop909/order3_pitch_only/pop909_order3_sample1.mid
+Generated MIDI saved to results/pop909/order3_pitch_only/pop909_order3_sample2.mid
+  Generated sample 2: 400 states -> results/pop909/order3_pitch_only/pop909_order3_sample2.mid
+Generated MIDI saved to results/pop909/order3_pitch_only/pop909_order3_sample3.mid
+  Generated sample 3: 400 states -> results/pop909/order3_pitch_only/pop909_order3_sample3.mid
+Generated MIDI saved to results/pop909/order3_pitch_only/pop909_order3_sample4.mid
+  Generated sample 4: 400 states -> results/pop909/order3_pitch_only/pop909_order3_sample4.mid
+Generated MIDI saved to results/pop909/order3_pitch_only/pop909_order3_sample5.mid
+  Generated sample 5: 400 states -> results/pop909/order3_pitch_only/pop909_order3_sample5.mid
+Model saved to results/pop909/order3_pitch_only/model_order3.pkl
+
+Model saved to results/pop909/order3_pitch_only/model_order3.pkl
+
+============================================================
+Training and generation complete!
+============================================================
+
+Generated files are in: results/pop909/order3_pitch_only
+Model file: results/pop909/order3_pitch_only/model_order3.pkl
+
+You can now:
+  1. Listen to the generated MIDI files
+  2. Compare different orders (run with --order 1, 2, 3)
+  3. Compare with/without rhythm (--include_rhythm flag)
+  4. Use the saved model to generate more music later
+POP909 - Order 3, With Rhythm...
+/Users/nehirozden/anaconda3/lib/python3.11/site-packages/music21/stream/base.py:3675: Music21DeprecationWarning: .flat is deprecated.  Call .flatten() instead
+  return self.iter().getElementsByClass(classFilterList)
+============================================================
+Markov Chain Music Generation - Training Pipeline
+============================================================
+Dataset: pop909
+Order: 3
+Include Rhythm: True
+Max Files: 100
+============================================================
+
+[Step 1] Loading dataset...
+Loading MIDI files from data/pop909/POP909...
+Found 100 MIDI files
+Processed 100/100 files...
+Successfully loaded 100 sequences
+Loaded 100 sequences
+Average sequence length: 403.9 states
+
+[Step 2] Splitting into train/validation sets...
+Training sequences: 80
+Validation sequences: 20
+
+[Step 3] Training 3-order Markov chain...
+Training 3-order Markov chain on 80 sequences...
+Learned 4012 unique contexts
+Total transitions: 31808
+Unique states: 168
+
+[Step 4] Evaluating model...
+
+Evaluating model on validation set...
+
+==================================================
+3-order Markov Chain Evaluation Metrics
+==================================================
+Negative Log-Likelihood (NLL): 362.4182
+Average Log-Likelihood: -362.4182
+State Coverage: 100.00%
+Validation Sequences: 20
+Valid Sequences (for evaluation): 20
+==================================================
+
+
+[Step 5] Generating 5 sample pieces...
+Generated MIDI saved to results/pop909/order3_with_rhythm/pop909_order3_sample1.mid
+  Generated sample 1: 400 states -> results/pop909/order3_with_rhythm/pop909_order3_sample1.mid
+Generated MIDI saved to results/pop909/order3_with_rhythm/pop909_order3_sample2.mid
+  Generated sample 2: 400 states -> results/pop909/order3_with_rhythm/pop909_order3_sample2.mid
+Generated MIDI saved to results/pop909/order3_with_rhythm/pop909_order3_sample3.mid
+  Generated sample 3: 400 states -> results/pop909/order3_with_rhythm/pop909_order3_sample3.mid
+Generated MIDI saved to results/pop909/order3_with_rhythm/pop909_order3_sample4.mid
+  Generated sample 4: 400 states -> results/pop909/order3_with_rhythm/pop909_order3_sample4.mid
+Generated MIDI saved to results/pop909/order3_with_rhythm/pop909_order3_sample5.mid
+  Generated sample 5: 400 states -> results/pop909/order3_with_rhythm/pop909_order3_sample5.mid
+Model saved to results/pop909/order3_with_rhythm/model_order3.pkl
+
+Model saved to results/pop909/order3_with_rhythm/model_order3.pkl
+
+============================================================
+Training and generation complete!
+============================================================
+
+Generated files are in: results/pop909/order3_with_rhythm
+Model file: results/pop909/order3_with_rhythm/model_order3.pkl
+
+You can now:
+  1. Listen to the generated MIDI files
+  2. Compare different orders (run with --order 1, 2, 3)
+  3. Compare with/without rhythm (--include_rhythm flag)
+  4. Use the saved model to generate more music later
+POP909 - Order 5, Pitch Only...
+/Users/nehirozden/anaconda3/lib/python3.11/site-packages/music21/stream/base.py:3675: Music21DeprecationWarning: .flat is deprecated.  Call .flatten() instead
+  return self.iter().getElementsByClass(classFilterList)
+============================================================
+Markov Chain Music Generation - Training Pipeline
+============================================================
+Dataset: pop909
+Order: 5
+Include Rhythm: False
+Max Files: 100
+============================================================
+
+[Step 1] Loading dataset...
+Loading MIDI files from data/pop909/POP909...
+Found 100 MIDI files
+Processed 100/100 files...
+Successfully loaded 100 sequences
+Loaded 100 sequences
+Average sequence length: 403.9 states
+
+[Step 2] Splitting into train/validation sets...
+Training sequences: 80
+Validation sequences: 20
+
+[Step 3] Training 5-order Markov chain...
+Training 5-order Markov chain on 80 sequences...
+Learned 4151 unique contexts
+Total transitions: 31648
+Unique states: 37
+
+[Step 4] Evaluating model...
+
+Evaluating model on validation set...
+
+==================================================
+5-order Markov Chain Evaluation Metrics
+==================================================
+Negative Log-Likelihood (NLL): 213.9854
+Average Log-Likelihood: -213.9854
+State Coverage: 100.00%
+Validation Sequences: 20
+Valid Sequences (for evaluation): 20
+==================================================
+
+
+[Step 5] Generating 5 sample pieces...
+Generated MIDI saved to results/pop909/order5_pitch_only/pop909_order5_sample1.mid
+  Generated sample 1: 400 states -> results/pop909/order5_pitch_only/pop909_order5_sample1.mid
+Generated MIDI saved to results/pop909/order5_pitch_only/pop909_order5_sample2.mid
+  Generated sample 2: 400 states -> results/pop909/order5_pitch_only/pop909_order5_sample2.mid
+Generated MIDI saved to results/pop909/order5_pitch_only/pop909_order5_sample3.mid
+  Generated sample 3: 400 states -> results/pop909/order5_pitch_only/pop909_order5_sample3.mid
+Generated MIDI saved to results/pop909/order5_pitch_only/pop909_order5_sample4.mid
+  Generated sample 4: 400 states -> results/pop909/order5_pitch_only/pop909_order5_sample4.mid
+Generated MIDI saved to results/pop909/order5_pitch_only/pop909_order5_sample5.mid
+  Generated sample 5: 400 states -> results/pop909/order5_pitch_only/pop909_order5_sample5.mid
+Model saved to results/pop909/order5_pitch_only/model_order5.pkl
+
+Model saved to results/pop909/order5_pitch_only/model_order5.pkl
+
+============================================================
+Training and generation complete!
+============================================================
+
+Generated files are in: results/pop909/order5_pitch_only
+Model file: results/pop909/order5_pitch_only/model_order5.pkl
+
+You can now:
+  1. Listen to the generated MIDI files
+  2. Compare different orders (run with --order 1, 2, 3)
+  3. Compare with/without rhythm (--include_rhythm flag)
+  4. Use the saved model to generate more music later
+POP909 - Order 5, With Rhythm...
+/Users/nehirozden/anaconda3/lib/python3.11/site-packages/music21/stream/base.py:3675: Music21DeprecationWarning: .flat is deprecated.  Call .flatten() instead
+  return self.iter().getElementsByClass(classFilterList)
+============================================================
+Markov Chain Music Generation - Training Pipeline
+============================================================
+Dataset: pop909
+Order: 5
+Include Rhythm: True
+Max Files: 100
+============================================================
+
+[Step 1] Loading dataset...
+Loading MIDI files from data/pop909/POP909...
+Found 100 MIDI files
+Processed 100/100 files...
+Successfully loaded 100 sequences
+Loaded 100 sequences
+Average sequence length: 403.9 states
+
+[Step 2] Splitting into train/validation sets...
+Training sequences: 80
+Validation sequences: 20
+
+[Step 3] Training 5-order Markov chain...
+Training 5-order Markov chain on 80 sequences...
+Learned 6346 unique contexts
+Total transitions: 31648
+Unique states: 168
+
+[Step 4] Evaluating model...
+
+Evaluating model on validation set...
+
+==================================================
+5-order Markov Chain Evaluation Metrics
+==================================================
+Negative Log-Likelihood (NLL): 173.2288
+Average Log-Likelihood: -173.2288
+State Coverage: 100.00%
+Validation Sequences: 20
+Valid Sequences (for evaluation): 20
+==================================================
+
+
+[Step 5] Generating 5 sample pieces...
+Generated MIDI saved to results/pop909/order5_with_rhythm/pop909_order5_sample1.mid
+  Generated sample 1: 400 states -> results/pop909/order5_with_rhythm/pop909_order5_sample1.mid
+Generated MIDI saved to results/pop909/order5_with_rhythm/pop909_order5_sample2.mid
+  Generated sample 2: 400 states -> results/pop909/order5_with_rhythm/pop909_order5_sample2.mid
+Generated MIDI saved to results/pop909/order5_with_rhythm/pop909_order5_sample3.mid
+  Generated sample 3: 400 states -> results/pop909/order5_with_rhythm/pop909_order5_sample3.mid
+Generated MIDI saved to results/pop909/order5_with_rhythm/pop909_order5_sample4.mid
+  Generated sample 4: 400 states -> results/pop909/order5_with_rhythm/pop909_order5_sample4.mid
+Generated MIDI saved to results/pop909/order5_with_rhythm/pop909_order5_sample5.mid
+  Generated sample 5: 400 states -> results/pop909/order5_with_rhythm/pop909_order5_sample5.mid
+Model saved to results/pop909/order5_with_rhythm/model_order5.pkl
+
+Model saved to results/pop909/order5_with_rhythm/model_order5.pkl
+
+============================================================
+Training and generation complete!
+============================================================
+
+Generated files are in: results/pop909/order5_with_rhythm
+Model file: results/pop909/order5_with_rhythm/model_order5.pkl
+
+You can now:
+  1. Listen to the generated MIDI files
+  2. Compare different orders (run with --order 1, 2, 3)
+  3. Compare with/without rhythm (--include_rhythm flag)
+  4. Use the saved model to generate more music later
+
+==========================================
+All experiments complete!
+Results saved in results/ directory
+==========================================
