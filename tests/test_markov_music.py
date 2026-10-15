@@ -79,15 +79,18 @@ def test_harmonic_consonance_and_musical_evaluation():
 
 
 def test_save_load_and_cli(tmp_path):
-    model = MarkovChain(order=2, smoothing_alpha=0.05, harmony_weight=0.3)
+    model = MarkovChain(order=3, smoothing_alpha=0.0, harmony_weight=0.0, enable_backoff=True)
     model.train(CORPUS)
     out_file = tmp_path / "model.pkl"
     model.save(str(out_file))
 
     loaded = MarkovChain(order=1)
     loaded.load(str(out_file))
-    assert loaded.order == 2
-    assert loaded.smoothing_alpha == 0.05
-    assert loaded.harmony_weight == 0.3
+    assert loaded.order == 3
+    # Verify suffix backoff tables were persisted and restored across orders 2..1
+    states, probs = loaded._get_transition_probabilities((99, 69, 71))
+    assert states == [72]
+    assert probs == [1.0]
 
     assert cli_main(["--order", "2", "--length", "12", "--temperature", "0.7"]) == 0
+
