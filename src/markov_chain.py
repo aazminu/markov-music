@@ -1,331 +1,405 @@
 """
 Markov Chain Model for Music Generation
 
-This module implements a Markov chain that can model musical sequences.
-It supports both first-order (next state depends only on current state) and
-higher-order (next state depends on multiple previous states) Markov chains.
-
-Key Dependencies:
-- MarkovChain: Main class for training and generating music
+Implements first-order and higher-order Markov chains with:
+- Variable-order Katz/suffix backoff across orders k, k-1, ..., 1
+- Additive Laplace smoothing
+- Log-sum-exp numerically stable temperature sampling & greedy decoding (temperature <= 0)
+- Per-transition negative log-likelihood (NLL), Perplexity, Pitch-Class Entropy,
+  Diatonic Scale Adherence, and Harmonic Consonance scoring.
 """
 
+from __future__ import annotations
+
+import math
 import pickle
+from collections import Counter, defaultdict
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 import numpy as np
-from collections import defaultdict
-from typing import List, Tuple, Optional
+
+MAJOR_SCALE_INTERVALS = {0, 2, 4, 5, 7, 9, 11}
+NATURAL_MINOR_INTERVALS = {0, 2, 3, 5, 7, 8, 10}
+
+# Semitone interval (mod 12) -> consonance weight in [0.1, 1.0]
+INTERVAL_CONSONANCE: Dict[int, float] = {
+    0: 1.00,   # Unison / Octave
+    7: 0.95,   # Perfect 5th
+    5: 0.90,   # Perfect 4th
+    4: 0.88,   # Major 3rd
+    3: 0.85,   # Minor 3rd
+    9: 0.82,   # Major 6th
+    8: 0.80,   # Minor 6th
+    2: 0.55,   # Major 2nd
+    10: 0.52,  # Minor 7th
+    11: 0.40,  # Major 7th
+    1: 0.25,   # Minor 2nd
+    6: 0.20,   # Tritone
+}
+
+
+def extract_midi_pitch(state: Any) -> Optional[int]:
+    """Extract an integer MIDI pitch from an int state or (pitch, duration) tuple."""
+    if isinstance(state, (int, np.integer)):
+        return int(state)
+    if isinstance(state, tuple) and len(state) >= 1 and isinstance(state[0], (int, np.integer)):
+        return int(state[0])
+    return None
+
+
+def score_harmonic_consonance(state_a: Any, state_b: Any) -> float:
+    """Compute harmonic/melodic interval consonance in [0, 1] between two states."""
+    pa = extract_midi_pitch(state_a)
+    pb = extract_midi_pitch(state_b)
+    if pa is None or pb is None:
+        return 0.5
+    semitones = abs(pb - pa)
+    interval_mod = semitones % 12
+    base = INTERVAL_CONSONANCE.get(interval_mod, 0.5)
+    # Penalize extreme melodic leaps > 1 octave
+    leap_penalty = max(0.0, (semitones - 12) * 0.03)
+    return max(0.05, min(1.0, base - leap_penalty))
 
 
 class MarkovChain:
     """
-    A Markov chain model for generating musical sequences.
-    
-    learns transition probabilities from training data and
-    generate new sequences based on those probabilities.
-    
-    Members:
-    -----------
-    order : int
-        The order of the Markov chain (1 = first-order, 2 = second-order, etc.)
-    transition_matrix : dict
-        Dictionary mapping state sequences to probability distributions
-    state_counts : dict
-        Dictionary counting occurrences of each state sequence
-    all_states: set
-        Set containing the states we've seen so far
+    Variable-order Markov chain model for musical sequence generation and evaluation.
     """
-    
-    def __init__(self, order: int = 1):
-        """
-        Initialize a Markov chain model.
-        
-        Parameters:
-        -----------
-        order : int
-            The order of the Markov chain.
-            - order=1: First-order (next state depends only on current state)
-            - order=2: Second-order (next state depends on previous 2 states)
-            - order=N: N-th order (next state depends on previous N states)
-        """
-        self.order = order
-        self.transition_matrix = defaultdict(lambda: defaultdict(int))
-        self.state_counts = defaultdict(int)
-        self.all_states = set()
-    
-    def _get_state_sequence(self, sequence: List, index: int) -> Tuple:
-        """
-        Extract the state sequence (context) for prediction at a given index.
-        
-        Parameters:
-        -----------
-        sequence : List
-            The full sequence of states
-        index : int
-            Current position in the sequence
-        
-        Returns:
-        --------
-            The state sequence (context) of length 'order'
-        
-        """
-        # Get the previous 'order' states
-        start_idx = max(0, index - self.order)
+
+    def __init__(
+        self,
+        order: int = 1,
+        smoothing_alpha: float = 0.0,
+        enable_backoff: bool = True,
+        harmony_weight: float = 0.0,
+    ):
+        if order < 1:
+            raise ValueError("order must be >= 1")
+        if smoothing_alpha < 0:
+            raise ValueError("smoothing_alpha must be >= 0")
+
+        self.order = int(order)
+        self.smoothing_alpha = float(smoothing_alpha)
+        self.enable_backoff = bool(enable_backoff)
+        self.harmony_weight = float(harmony_weight)
+
+        self.transition_matrix: Dict[Tuple, Dict[Any, int]] = defaultdict(lambda: defaultdict(int))
+        self.state_counts: Dict[Tuple, int] = defaultdict(int)
+        # Lower-order suffix tables for variable-order backoff (order k-1 .. 1)
+        self.backoff_matrices: Dict[int, Dict[Tuple, Dict[Any, int]]] = {
+            k: defaultdict(lambda: defaultdict(int)) for k in range(1, self.order)
+        }
+        self.backoff_counts: Dict[int, Dict[Tuple, int]] = {
+            k: defaultdict(int) for k in range(1, self.order)
+        }
+        self.unigram_counts: Dict[Any, int] = defaultdict(int)
+        self.total_unigrams: int = 0
+        self.all_states: set = set()
+
+    def _get_state_sequence(self, sequence: Sequence, index: int, order: Optional[int] = None) -> Tuple:
+        k = self.order if order is None else order
+        start_idx = max(0, index - k)
         context = tuple(sequence[start_idx:index])
-        
-        # Pad with None if we don't have enough history (for beginning of sequence)
-        while len(context) < self.order:
+        while len(context) < k:
             context = (None,) + context
-        
         return context
-    
+
     def train(self, sequences: List[List]):
-        """
-        Train the Markov chain on a list of sequences.
-        
-        Parameters:
-        -----------
-        sequences : List[List]
-            List of training sequences. Each sequence is a list of states
-            (e.g., [(pitch, duration), ...] or [pitch, ...])
-        
-        """
-        print(f"Training {self.order}-order Markov chain on {len(sequences)} sequences...")
-        
-        # Reset the model
+        """Train the Markov chain and all lower-order suffix backoff tables."""
         self.transition_matrix = defaultdict(lambda: defaultdict(int))
         self.state_counts = defaultdict(int)
+        self.backoff_matrices = {
+            k: defaultdict(lambda: defaultdict(int)) for k in range(1, self.order)
+        }
+        self.backoff_counts = {
+            k: defaultdict(int) for k in range(1, self.order)
+        }
+        self.unigram_counts = defaultdict(int)
+        self.total_unigrams = 0
         self.all_states = set()
-        
+
         total_transitions = 0
-        
-        # Process each sequence
-        for seq_idx, sequence in enumerate(sequences):
-            # Skip sequences that are too short
-            if len(sequence) < self.order + 1:
+
+        for sequence in sequences:
+            if not sequence or len(sequence) < self.order + 1:
                 continue
-            
-            # Track all states we see
+
             for state in sequence:
                 self.all_states.add(state)
-            
-            # Build transition counts
+                self.unigram_counts[state] += 1
+                self.total_unigrams += 1
+
             for i in range(self.order, len(sequence)):
-                context = self._get_state_sequence(sequence, i)
-                
+                context = self._get_state_sequence(sequence, i, self.order)
                 next_state = sequence[i]
-                
-                # Increment the count for this transition
                 self.transition_matrix[context][next_state] += 1
                 self.state_counts[context] += 1
                 total_transitions += 1
-        
-        print(f"Learned {len(self.transition_matrix)} unique contexts")
-        print(f"Total transitions: {total_transitions}")
-        print(f"Unique states: {len(self.all_states)}")
-    
-    def _get_transition_probabilities(self, context: Tuple) -> Tuple[List, List]:
-        """
-        Get the probability distribution for the next state given a context.
-        
-        Parameters:
-        -----------
-        context : Tuple
-            The current context (previous N states)
-        
-        Returns:
-        --------
-        Tuple[List, List]
-            (possible_next_states, probabilities) where probabilities sum to 1.0
-        """
-        if context not in self.transition_matrix:
-            # If we've never seen this context, return uniform distribution
-            # over all states we've seen
-            states = list(self.all_states)
-            if not states:
-                return [], []
-            probs = [1.0 / len(states)] * len(states)
-            return states, probs
-        
-        next_state_counts = self.transition_matrix[context]
-        total_count = self.state_counts[context]
-        
-        if total_count == 0:
-            # Fallback: uniform distribution
-            states = list(self.all_states)
-            if not states:
-                return [], []
-            probs = [1.0 / len(states)] * len(states)
-            return states, probs
-        
-        # Convert counts to probabilities
-        states = []
-        probs = []
-        
-        for state, count in next_state_counts.items():
-            states.append(state)
-            probs.append(count / total_count)
-        
-        # Normalize
+
+            for k in range(1, self.order):
+                for i in range(k, len(sequence)):
+                    sub_ctx = tuple(sequence[i - k : i])
+                    next_state = sequence[i]
+                    self.backoff_matrices[k][sub_ctx][next_state] += 1
+                    self.backoff_counts[k][sub_ctx] += 1
+
+    def _counts_to_distribution(
+        self, counts_map: Dict[Any, int], total_count: int, last_state: Any = None
+    ) -> Tuple[List, List[float]]:
+        vocab = sorted(self.all_states, key=lambda x: str(x))
+        if not vocab:
+            return [], []
+
+        if self.smoothing_alpha > 0.0:
+            states = vocab
+            denom = total_count + self.smoothing_alpha * len(vocab)
+            probs = [(counts_map.get(s, 0) + self.smoothing_alpha) / denom for s in states]
+        else:
+            states = list(counts_map.keys())
+            probs = [counts_map[s] / total_count for s in states]
+
+        if self.harmony_weight > 0.0 and last_state is not None:
+            weighted = []
+            for s, p in zip(states, probs):
+                cons = score_harmonic_consonance(last_state, s)
+                factor = (1.0 - self.harmony_weight) + self.harmony_weight * cons
+                weighted.append(p * factor)
+            probs = weighted
+
         total_prob = sum(probs)
         if total_prob > 0:
             probs = [p / total_prob for p in probs]
-        
         return states, probs
-    
-    def generate(self, length: int, start_context: Optional[Tuple] = None, 
-                 temperature: float = 1.0) -> List:
+
+    def _get_transition_probabilities(self, context: Tuple) -> Tuple[List, List[float]]:
         """
-        Generate a new sequence using the trained Markov chain.
-        
-        Parameters:
-        -----------
-        length : int
-            Desired length of the generated sequence
-        start_context : Tuple, optional
-            Starting context (previous N states). If None, randomly selects
-            a context that was seen during training.
-        temperature : float
-            Controls randomness (1.0 = normal, >1.0 = more random, <1.0 = more deterministic)
-        
-        Returns:
-        --------
-        List
-            Generated sequence of states
+        Get probability distribution for next state given context,
+        backing off across suffix contexts of length k-1 .. 1 if unseen.
+        """
+        last_state = context[-1] if context else None
+
+        if context in self.transition_matrix and self.state_counts[context] > 0:
+            return self._counts_to_distribution(
+                self.transition_matrix[context], self.state_counts[context], last_state
+            )
+
+        if self.enable_backoff and self.order > 1:
+            for k in range(self.order - 1, 0, -1):
+                sub_ctx = context[-k:]
+                if sub_ctx in self.backoff_matrices[k] and self.backoff_counts[k][sub_ctx] > 0:
+                    return self._counts_to_distribution(
+                        self.backoff_matrices[k][sub_ctx],
+                        self.backoff_counts[k][sub_ctx],
+                        last_state,
+                    )
+
+            if self.total_unigrams > 0:
+                return self._counts_to_distribution(
+                    self.unigram_counts, self.total_unigrams, last_state
+                )
+
+        states = sorted(self.all_states, key=lambda x: str(x))
+        if not states:
+            return [], []
+        probs = [1.0 / len(states)] * len(states)
+        return states, probs
+
+    def generate(
+        self,
+        length: int,
+        start_context: Optional[Tuple] = None,
+        temperature: float = 1.0,
+        seed: Optional[int] = None,
+    ) -> List:
+        """
+        Generate a musical sequence of `length` states with numerically stable
+        temperature scaling (and greedy decoding when temperature <= 0).
         """
         if not self.transition_matrix:
             raise ValueError("Model not trained yet. Call train() first.")
-        
+        if length <= 0:
+            return []
+
+        rng = np.random.default_rng(seed)
         generated = []
-        
+
         if start_context is None:
-            # Randomly select a context that we've seen during training
             available_contexts = list(self.transition_matrix.keys())
             if not available_contexts:
                 raise ValueError("No training data available")
-            context = available_contexts[np.random.randint(len(available_contexts))]
+            context = available_contexts[int(rng.integers(0, len(available_contexts)))]
         else:
-            context = start_context
-        
-        # Generate sequence
+            context = tuple(start_context)
+            if len(context) < self.order:
+                context = (None,) * (self.order - len(context)) + context
+            elif len(context) > self.order:
+                context = context[-self.order :]
+
         for _ in range(length):
-            # Get probability distribution for next state
             next_states, probabilities = self._get_transition_probabilities(context)
-            
+
             if not next_states:
-                # If no transitions available, pick a random state
-                all_states = list(self.all_states)
+                all_states = sorted(self.all_states, key=lambda x: str(x))
                 if not all_states:
                     break
-                next_state = all_states[np.random.randint(len(all_states))]
+                next_state = all_states[int(rng.integers(0, len(all_states)))]
             else:
-                # Apply temperature to probabilities
-                if temperature != 1.0:
-                    # Convert to log space, divide by temperature, convert back
-                    log_probs = np.log(np.array(probabilities) + 1e-10)
-                    scaled_log_probs = log_probs / temperature
-                    probabilities = np.exp(scaled_log_probs)
-                    probabilities = probabilities / probabilities.sum()
-                
-                # Sample from the distribution
-                # Use index-based sampling to handle tuples correctly
-                idx = np.random.choice(len(next_states), p=probabilities)
-                next_state = next_states[idx]
-            
+                probs_arr = np.asarray(probabilities, dtype=np.float64)
+                if temperature <= 1e-6:
+                    idx = int(np.argmax(probs_arr))
+                    next_state = next_states[idx]
+                else:
+                    if abs(temperature - 1.0) > 1e-9:
+                        log_probs = np.log(np.maximum(probs_arr, 1e-12)) / float(temperature)
+                        log_probs = log_probs - np.max(log_probs)
+                        scaled = np.exp(log_probs)
+                        probs_arr = scaled / np.sum(scaled)
+                    else:
+                        probs_arr = probs_arr / np.sum(probs_arr)
+                    idx = int(rng.choice(len(next_states), p=probs_arr))
+                    next_state = next_states[idx]
+
             generated.append(next_state)
-            
-            # shift and add new state
             if self.order > 0:
                 context = context[1:] + (next_state,)
             else:
                 context = (next_state,)
-        
+
         return generated
-    
+
     def calculate_log_likelihood(self, sequence: List) -> float:
-        """
-        Calculate the log-likelihood of a sequence under this model.
-        
-        Parameters:
-        -----------
-        sequence : List
-            A sequence of states to evaluate
-        
-        Returns:
-        --------
-        float
-            Log-likelihood of the sequence (higher is better)
-        """
+        """Calculate total log-likelihood of a sequence under this model."""
         if len(sequence) < self.order + 1:
-            return float('-inf')
-        
+            return float("-inf")
+
         log_likelihood = 0.0
-        
         for i in range(self.order, len(sequence)):
             context = self._get_state_sequence(sequence, i)
             next_state = sequence[i]
-            
-            # Get probability of this transition
             next_states, probabilities = self._get_transition_probabilities(context)
-            
+
             if next_state in next_states:
                 idx = next_states.index(next_state)
                 prob = probabilities[idx]
-                # Add log probability (use small epsilon to avoid log(0))
-                log_likelihood += np.log(prob + 1e-10)
+                log_likelihood += float(np.log(max(prob, 1e-10)))
             else:
-                # State never seen in this context
-                log_likelihood += np.log(1e-10)
-        
+                log_likelihood += float(np.log(1e-10))
+
         return log_likelihood
-    
+
     def calculate_negative_log_likelihood(self, sequences: List[List]) -> float:
-        """
-        Calculate the average Negative Log-Likelihood (NLL) on a set of sequences.
-        
-        Parameters:
-        -----------
-        sequences : List[List]
-            List of sequences to evaluate
-        
-        Returns:
-        --------
-        float
-            Average NLL (lower is better)
-        """
+        """Calculate average Negative Log-Likelihood (NLL) across sequences."""
         total_log_likelihood = 0.0
         valid_sequences = 0
-        
+
         for sequence in sequences:
             if len(sequence) >= self.order + 1:
                 ll = self.calculate_log_likelihood(sequence)
-                if ll != float('-inf'):
+                if ll != float("-inf"):
                     total_log_likelihood += ll
                     valid_sequences += 1
-        
-        if valid_sequences == 0:
-            return float('inf')
-        
-        avg_log_likelihood = total_log_likelihood / valid_sequences
-        return -avg_log_likelihood  # Return negative (NLL)
-    
-    def save(self, filepath: str):
-        """Save the trained model to a file."""
-        with open(filepath, 'wb') as f:
-            pickle.dump({
-                'order': self.order,
-                'transition_matrix': dict(self.transition_matrix),
-                'state_counts': dict(self.state_counts),
-                'all_states': list(self.all_states)
-            }, f)
-        print(f"Model saved to {filepath}")
-    
-    def load(self, filepath: str):
-        """Load a trained model from a file."""
-        with open(filepath, 'rb') as f:
-            data = pickle.load(f)
-            self.order = data['order']
-            self.transition_matrix = defaultdict(lambda: defaultdict(int), 
-                                                 {k: dict(v) for k, v in data['transition_matrix'].items()})
-            self.state_counts = defaultdict(int, data['state_counts'])
-            self.all_states = set(data['all_states'])
-        print(f"Model loaded from {filepath}")
 
+        if valid_sequences == 0:
+            return float("inf")
+
+        return -(total_log_likelihood / valid_sequences)
+
+    def calculate_perplexity(self, sequences: List[List]) -> float:
+        """Calculate per-transition perplexity exp(-1/T * sum log P(x_t | context))."""
+        total_ll = 0.0
+        total_transitions = 0
+
+        for seq in sequences:
+            if len(seq) >= self.order + 1:
+                ll = self.calculate_log_likelihood(seq)
+                if math.isfinite(ll):
+                    total_ll += ll
+                    total_transitions += len(seq) - self.order
+
+        if total_transitions == 0:
+            return float("inf")
+
+        avg_nll_per_token = -total_ll / total_transitions
+        return float(math.exp(min(avg_nll_per_token, 50.0)))
+
+    def save(self, filepath: str):
+        with open(filepath, "wb") as f:
+            pickle.dump(
+                {
+                    "order": self.order,
+                    "smoothing_alpha": self.smoothing_alpha,
+                    "enable_backoff": self.enable_backoff,
+                    "harmony_weight": self.harmony_weight,
+                    "transition_matrix": dict(self.transition_matrix),
+                    "state_counts": dict(self.state_counts),
+                    "unigram_counts": dict(self.unigram_counts),
+                    "total_unigrams": self.total_unigrams,
+                    "all_states": list(self.all_states),
+                },
+                f,
+            )
+
+    def load(self, filepath: str):
+        with open(filepath, "rb") as f:
+            data = pickle.load(f)
+            self.order = data["order"]
+            self.smoothing_alpha = data.get("smoothing_alpha", 0.0)
+            self.enable_backoff = data.get("enable_backoff", True)
+            self.harmony_weight = data.get("harmony_weight", 0.0)
+            self.transition_matrix = defaultdict(
+                lambda: defaultdict(int),
+                {k: defaultdict(int, v) for k, v in data["transition_matrix"].items()},
+            )
+            self.state_counts = defaultdict(int, data["state_counts"])
+            self.unigram_counts = defaultdict(int, data.get("unigram_counts", {}))
+            self.total_unigrams = data.get("total_unigrams", 0)
+            self.all_states = set(data["all_states"])
+
+
+def evaluate_musical_sequence(sequence: Sequence[Any]) -> Dict[str, float]:
+    """
+    Compute music-theoretic and information-theoretic quality metrics for a generated sequence:
+    - pitch_class_entropy_bits: Shannon entropy of pitch classes mod 12
+    - max_diatonic_adherence: Best-fit major/minor key scale adherence in [0, 1]
+    - mean_consonance: Mean melodic interval consonance in [0, 1]
+    - stepwise_motion_ratio: Fraction of intervals <= 2 semitones
+    """
+    pitches = [p for p in (extract_midi_pitch(s) for s in sequence) if p is not None]
+    if not pitches:
+        return {
+            "pitch_class_entropy_bits": 0.0,
+            "max_diatonic_adherence": 0.0,
+            "mean_consonance": 0.0,
+            "stepwise_motion_ratio": 0.0,
+        }
+
+    pcs = [p % 12 for p in pitches]
+    counts = Counter(pcs)
+    n = len(pcs)
+    entropy = -sum((c / n) * math.log2(c / n) for c in counts.values())
+
+    best_adherence = 0.0
+    for tonic in range(12):
+        maj_set = {(tonic + iv) % 12 for iv in MAJOR_SCALE_INTERVALS}
+        min_set = {(tonic + iv) % 12 for iv in NATURAL_MINOR_INTERVALS}
+        maj_score = sum(1 for pc in pcs if pc in maj_set) / n
+        min_score = sum(1 for pc in pcs if pc in min_set) / n
+        best_adherence = max(best_adherence, maj_score, min_score)
+
+    if len(pitches) >= 2:
+        consonances = [
+            score_harmonic_consonance(pitches[i], pitches[i + 1])
+            for i in range(len(pitches) - 1)
+        ]
+        intervals = [abs(pitches[i + 1] - pitches[i]) for i in range(len(pitches) - 1)]
+        mean_cons = sum(consonances) / len(consonances)
+        stepwise = sum(1 for iv in intervals if iv <= 2) / len(intervals)
+    else:
+        mean_cons = 1.0
+        stepwise = 1.0
+
+    return {
+        "pitch_class_entropy_bits": round(entropy, 4),
+        "max_diatonic_adherence": round(best_adherence, 4),
+        "mean_consonance": round(mean_cons, 4),
+        "stepwise_motion_ratio": round(stepwise, 4),
+    }
